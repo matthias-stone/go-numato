@@ -44,7 +44,7 @@ func TestSimulation(t *testing.T) {
 		time.Sleep(time.Millisecond * 100)
 		isOn, err := n.IsOn(port)
 		assert.NoError(t, err, "reading port status", port)
-		assert.True(t, isOn, "port not off", port)
+		assert.False(t, isOn, "port not off", port)
 	}
 
 	assert.NoError(t, n.Close())

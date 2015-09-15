@@ -2,9 +2,9 @@
 package numato
 
 import (
+	"bytes"
 	"fmt"
 	"io"
-	"strings"
 	"time"
 
 	"github.com/tarm/serial"
@@ -69,15 +69,20 @@ func (n *Numato) Set(p Port, s state) error {
 
 // IsOn returns the current state of a relay or GPIO pin.
 func (n *Numato) IsOn(p Port) (bool, error) {
+	buf := make([]byte, 64)
+	_, err := n.port.Read(buf) // Clear data left in buffer
 	n.action(p, read)
-	buf := make([]byte, 128)
 
-	_, err := n.port.Read(buf)
+	c, err := n.port.Read(buf)
 	if err != nil {
 		return false, err
 	}
+	// This double read fixes a propogation delay in the numato response
+	if _, err = n.port.Read(buf[c:]); err != nil && err != io.EOF {
+		return false, err
+	}
 
-	return strings.Contains(string(buf), string(read)), nil
+	return bytes.Contains(buf, []byte("\n\r"+On+"\n\r")), nil
 }
 
 // Close releases the serial port.
