@@ -36,6 +36,11 @@ const (
 	ADC         = portType("adc")
 )
 
+var actions = map[portType]map[state]string{
+	Relay: {On: "on", Off: "off", read: "read"},
+	GPIO:  {On: "set", Off: "clear", read: "read"},
+}
+
 // Port is either a relay or GPIO.
 type Port struct {
 	Class  portType
@@ -94,7 +99,7 @@ func (n *Numato) Close() error {
 }
 
 func (n *Numato) action(p Port, s state) error {
-	_, err := n.port.Write([]byte(fmt.Sprintf("%s %s %d\r", p.Class, s, p.Number)))
+	_, err := n.port.Write([]byte(fmt.Sprintf("%s %s %d\r", p.Class, actions[p.Class][s], p.Number)))
 	if err != nil {
 		return err
 	}

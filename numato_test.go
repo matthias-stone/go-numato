@@ -14,7 +14,7 @@ func init() {
 	flag.Parse()
 }
 
-func TestSimulation(t *testing.T) {
+func TestHardware(t *testing.T) {
 	if *serialPath == "" {
 		t.Skip("Skipping hardware test. Run with -serial=serialpath to enable")
 	}
@@ -48,4 +48,34 @@ func TestSimulation(t *testing.T) {
 	}
 
 	assert.NoError(t, n.Close())
+}
+
+func TestGPIOBlink(t *testing.T) {
+	if *serialPath == "" {
+		t.Skip("Skipping hardware test. Run with -serial=serialpath to enable")
+	}
+
+	n, err := Open(*serialPath)
+	if !assert.NoError(t, err) {
+		t.Fatal()
+	}
+
+	p := []Port{
+		{GPIO, 0},
+		{GPIO, 1},
+		{GPIO, 2},
+		{GPIO, 3},
+		{GPIO, 4},
+		{GPIO, 5},
+	}
+
+	for _, port := range p {
+		assert.NoError(t, n.On(port), "turning port on", port)
+		time.Sleep(time.Millisecond * 100)
+	}
+
+	for _, port := range p {
+		assert.NoError(t, n.Off(port), "turning port off", port)
+		time.Sleep(time.Millisecond * 100)
+	}
 }
