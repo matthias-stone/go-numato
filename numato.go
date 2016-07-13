@@ -1,4 +1,5 @@
 // Package numato provides a simple interface for controlling a Numato USB digital input-output device.
+// Actions are limited to 100hz
 package numato
 
 import (
@@ -77,7 +78,6 @@ func (n *Numato) IsOn(p Port) (bool, error) {
 	buf := make([]byte, 64)
 	_, err := n.port.Read(buf) // Clear data left in buffer
 	n.action(p, read)
-
 	c, err := n.port.Read(buf)
 	if err != nil {
 		return false, err
@@ -103,6 +103,7 @@ func (n *Numato) action(p Port, s state) error {
 	if err != nil {
 		return err
 	}
+	time.Sleep(10 * time.Millisecond)
 
 	return nil
 }

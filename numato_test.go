@@ -79,3 +79,21 @@ func TestGPIOBlink(t *testing.T) {
 		time.Sleep(time.Millisecond * 100)
 	}
 }
+
+func TestHammer(t *testing.T) {
+	if *serialPath == "" {
+		t.Skip("Skipping hardware test. Run with -serial=serialpath to enable")
+	}
+
+	n, err := Open(*serialPath)
+	if !assert.NoError(t, err) {
+		t.Fatal()
+	}
+
+	port := Port{Relay, 3}
+
+	for i := 0; i < 50; i++ {
+		assert.NoError(t, n.On(port), "turning port on", port)
+		assert.NoError(t, n.Off(port), "turning port off", port)
+	}
+}
