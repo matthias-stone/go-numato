@@ -33,7 +33,7 @@ func TestHardware(t *testing.T) {
 
 	for _, port := range p {
 		assert.NoError(t, n.On(port), "turning port on", port)
-		time.Sleep(time.Millisecond * 100)
+		time.Sleep(time.Millisecond * 50)
 		isOn, err := n.IsOn(port)
 		assert.NoError(t, err, "reading port status", port)
 		assert.True(t, isOn, "port not on", port)
@@ -41,7 +41,7 @@ func TestHardware(t *testing.T) {
 
 	for _, port := range p {
 		assert.NoError(t, n.Off(port), "turning port off", port)
-		time.Sleep(time.Millisecond * 100)
+		time.Sleep(time.Millisecond * 50)
 		isOn, err := n.IsOn(port)
 		assert.NoError(t, err, "reading port status", port)
 		assert.False(t, isOn, "port not off", port)
@@ -69,14 +69,13 @@ func TestGPIOBlink(t *testing.T) {
 		{GPIO, 5},
 	}
 
-	for _, port := range p {
-		assert.NoError(t, n.On(port), "turning port on", port)
-		time.Sleep(time.Millisecond * 100)
-	}
-
-	for _, port := range p {
-		assert.NoError(t, n.Off(port), "turning port off", port)
-		time.Sleep(time.Millisecond * 100)
+	for i := 0; i < 10; i++ {
+		for _, port := range p {
+			assert.NoError(t, n.On(port), "turning port on", port)
+		}
+		for _, port := range p {
+			assert.NoError(t, n.Off(port), "turning port off", port)
+		}
 	}
 }
 
